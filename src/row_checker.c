@@ -1,10 +1,18 @@
 #include<stdio.h>
 
+#include"row_checker.h"
+
 void* row_checker (void* ptr) {
 
-    int myIndex = *((int*)ptr);
+    RowCheckerParams* params;
+    int myIndex;
+    int (*sol)[9];
 
-    printf("Row Checker %d Started\n", myIndex);
+    params = (RowCheckerParams*)ptr;
+    myIndex = params->i;
+    sol = params->sol;
+
+    printf("Row Checker %d Started\n", params->i);
 
     return NULL;
 

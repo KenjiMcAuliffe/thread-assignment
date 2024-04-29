@@ -16,9 +16,10 @@ int main(void) {
     int counter;
     pthread_t rowThreads[3];
     pthread_t colThread;
-    int i;
-    int thread_indices[3] = {0, 1, 2};
+    RowCheckerParams rowCheckerParams[3];
+    ColCheckerParams colCheckerParams;
 
+    int i;
 
     /* ---------------------- INITIALIZATION -------------------------- */
 
@@ -32,15 +33,18 @@ int main(void) {
     /* --------------------- THREAD CREATION -------------------------- */
 
     for(i = 0; i < 3; i++) {
+        rowCheckerParams[i].i = i;
+        rowCheckerParams[i].sol = (int(*)[9])sol;
         pthread_create(
             &rowThreads[i],
             NULL,
             row_checker,
-            (void*)&thread_indices[i]
+            (void*)&rowCheckerParams[i]
         );
     }
 
-    pthread_create(&colThread, NULL, col_checker, NULL);
+    colCheckerParams.sol = (int(*)[9])sol;
+    pthread_create(&colThread, NULL, col_checker, (void*)&colCheckerParams);
 
     /* -------------------------- CLEANUP ----------------------------- */
 
