@@ -7,7 +7,9 @@
 
 int main(void) {
 
-    /* ------------------ VARIABLE DECLARATIONS ----------------------- */
+    /* ---------------------------- BEGIN ----------------------------- */
+
+    /* -------------------- VARIABLE DECLARATIONS --------------------- */
 
     int sol[9][9];
     int row[9];
@@ -58,10 +60,21 @@ int main(void) {
     }
     pthread_join(colThread, NULL);
 
+    /* --------------------------- OUTPUT ----------------------------- */
+
+    printf("Rows: ");
     for(i = 0; i < 9; i++) {
         printf("%d ", row[i]);
     }
     printf("\n");
+
+    printf("Cols: ");
+    for(i = 0; i < 9; i++) {
+        printf("%d ", col[i]);
+    }
+    printf("\n");
+
+    /* ----------------------------- END ------------------------------ */
 
     return 0;
 

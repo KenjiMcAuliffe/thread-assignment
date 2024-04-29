@@ -17,7 +17,7 @@ void* row_checker (void* ptr) {
     sol = ((RowCheckerParams*)ptr)->sol;
 
     for(i = startRowIndex; i < startRowIndex + 3; i++) {
-        (*row)[i] = isValidRow(sol[i]);
+        (*row)[i] = is_valid_row(sol[i]);
     }
 
     /* Check subgrids */
@@ -27,7 +27,7 @@ void* row_checker (void* ptr) {
 
 }
 
-int isValidRow(int row[9]) {
+int is_valid_row(int row[9]) {
 
     int isValid;
     int seen[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};

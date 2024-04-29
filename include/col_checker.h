@@ -8,4 +8,6 @@ typedef struct {
 
 void* col_checker (void* ptr);
 
+int is_valid_col(int (*sol)[9], int colIndex);
+
 #endif
