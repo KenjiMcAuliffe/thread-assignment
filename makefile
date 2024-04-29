@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Iinclude -Wall -g
+CFLAGS=-Iinclude -Wall -g -ansi -pedantic
 LDFLAGS=
 EXEC=mssv
 

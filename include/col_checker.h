@@ -3,6 +3,7 @@
 
 typedef struct {
     int (*sol)[9];
+    int (*col)[9];
 } ColCheckerParams;
 
 void* col_checker (void* ptr);

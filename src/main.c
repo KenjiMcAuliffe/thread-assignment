@@ -14,9 +14,11 @@ int main(void) {
     int col[9];
     int sub[9];
     int counter;
+
     pthread_t rowThreads[3];
-    pthread_t colThread;
     RowCheckerParams rowCheckerParams[3];
+
+    pthread_t colThread;
     ColCheckerParams colCheckerParams;
 
     int i;
@@ -35,6 +37,8 @@ int main(void) {
     for(i = 0; i < 3; i++) {
         rowCheckerParams[i].i = i;
         rowCheckerParams[i].sol = (int(*)[9])sol;
+        rowCheckerParams[i].row = (int(*)[9])row;
+        rowCheckerParams[i].sub = (int(*)[9])sub;
         pthread_create(
             &rowThreads[i],
             NULL,
@@ -44,6 +48,7 @@ int main(void) {
     }
 
     colCheckerParams.sol = (int(*)[9])sol;
+    colCheckerParams.col = (int(*)[9])col;
     pthread_create(&colThread, NULL, col_checker, (void*)&colCheckerParams);
 
     /* -------------------------- CLEANUP ----------------------------- */
@@ -52,6 +57,11 @@ int main(void) {
         pthread_join(rowThreads[i], NULL);
     }
     pthread_join(colThread, NULL);
+
+    for(i = 0; i < 9; i++) {
+        printf("%d ", row[i]);
+    }
+    printf("\n");
 
     return 0;
 

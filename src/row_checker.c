@@ -4,16 +4,45 @@
 
 void* row_checker (void* ptr) {
 
-    RowCheckerParams* params;
     int myIndex;
+    int startRowIndex;
     int (*sol)[9];
+    int (*row)[9];
+    int i;
 
-    params = (RowCheckerParams*)ptr;
-    myIndex = params->i;
-    sol = params->sol;
+    myIndex = ((RowCheckerParams*)ptr)->i;
+    printf("Row checker %d started.\n", myIndex);
+    startRowIndex = (myIndex * 3);
+    row = ((RowCheckerParams*)ptr)->row;
+    sol = ((RowCheckerParams*)ptr)->sol;
 
-    printf("Row Checker %d Started\n", params->i);
+    for(i = startRowIndex; i < startRowIndex + 3; i++) {
+        (*row)[i] = isValidRow(sol[i]);
+    }
 
+    /* Check subgrids */
+
+    printf("Row checker %d finished.\n", myIndex);
     return NULL;
+
+}
+
+int isValidRow(int row[9]) {
+
+    int isValid;
+    int seen[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int i;
+
+    isValid = 1;
+
+    for(i = 0; i < 9; i++) {
+        int num = row[i];
+        if(seen[num - 1] == 1) {
+            isValid = 0;
+        }
+        seen[num - 1] = 1;
+    }
+
+    return isValid;
 
 }
