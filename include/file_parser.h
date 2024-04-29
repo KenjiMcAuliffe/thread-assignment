@@ -3,6 +3,4 @@
 
 void parse_solution_file(int sol[9][9]);
 
-void print_sol(int sol[9][9]);
-
 #endif

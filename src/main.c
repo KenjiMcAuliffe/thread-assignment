@@ -30,10 +30,6 @@ int main(void) {
     parse_solution_file(sol);
     counter = 0;
 
-    printf("Analysing the following sudoku solution:\n");
-    print_sol(sol);
-    printf("\n");
-
     /* --------------------- THREAD CREATION -------------------------- */
 
     for(i = 0; i < 3; i++) {

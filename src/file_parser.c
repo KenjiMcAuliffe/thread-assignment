@@ -4,7 +4,18 @@
 
 void parse_solution_file(int sol[9][9]) {
 
-    FILE *file = fopen(SOLUTION_FILE_NAME, "r");
+    /* ---------------------------- BEGIN ----------------------------- */
+
+    /* -------------------- VARIABLE DECLARATIONS --------------------- */
+
+    FILE *file;
+
+    /* ------------------------ INITIALZATION ------------------------- */
+
+    file = fopen(SOLUTION_FILE_NAME, "r");
+
+    /* ------------------------- FILE READING ------------------------- */
+
     if (file == NULL) {
         perror("Error opening file");
         return;
@@ -17,20 +28,8 @@ void parse_solution_file(int sol[9][9]) {
         }
     }
 
+    /* ------------------------------ END ----------------------------- */
+
     fclose(file);
 
 }
-
-void print_sol(int sol[9][9]) {
-
-    int r, c;
-
-    for(r = 0; r < 9; r++) {
-        for(c = 0; c < 9; c++) {
-            printf("%d ", sol[r][c]);
-        }
-        printf("\n");
-    }
-
-}
-

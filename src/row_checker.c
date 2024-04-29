@@ -45,11 +45,19 @@ void* row_checker (void* ptr) {
 
 int is_valid_row(int row[9]) {
 
+    /* --------------------------- BEGIN ------------------------------ */
+
+    /* -------------------- VARIABLE DECLARATIONS --------------------- */
+
     int isValid;
     int seen[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     int i;
 
+    /* ------------------------ INITIALZATION ------------------------ */
+
     isValid = 1;
+
+    /* --------------------------- CHECKING -------------------------- */
 
     for(i = 0; i < 9; i++) {
         int num = row[i];
@@ -59,11 +67,17 @@ int is_valid_row(int row[9]) {
         seen[num - 1] = 1;
     }
 
+    /* -----------------------------  END ---------------------------- */
+
     return isValid;
 
 }
 
 int is_valid_sub(int (*sol)[9], int subIndex) {
+
+    /* --------------------------- BEGIN ------------------------------ */
+
+    /* -------------------- VARIABLE DECLARATIONS --------------------- */
 
     int isValid;
     int seen[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -72,9 +86,13 @@ int is_valid_sub(int (*sol)[9], int subIndex) {
     int r;
     int c;
 
+    /* ------------------------ INITIALZATION ------------------------ */
+
     isValid = 1;
     startRowIndex = subIndex - (subIndex % 3);
     startColIndex = (subIndex % 3) * 3;
+
+    /* --------------------------- CHECKING -------------------------- */
 
     for(r = startRowIndex; r < startRowIndex + 3; r++) {
         for(c = startColIndex; c < startColIndex + 3; c++) {
@@ -85,6 +103,8 @@ int is_valid_sub(int (*sol)[9], int subIndex) {
             seen[curVal - 1] = 1;
         }
     }
+
+    /* -----------------------------  END ---------------------------- */
 
     return isValid;
 
