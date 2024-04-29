@@ -74,6 +74,12 @@ int main(void) {
     }
     printf("\n");
 
+    printf("Subs: ");
+    for(i = 0; i < 9; i++) {
+        printf("%d ", sub[i]);
+    }
+    printf("\n");
+
     /* ----------------------------- END ------------------------------ */
 
     return 0;

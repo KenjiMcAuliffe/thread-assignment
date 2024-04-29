@@ -4,25 +4,41 @@
 
 void* row_checker (void* ptr) {
 
+    /* --------------------------- BEGIN ------------------------------ */
+
+    /* -------------------- VARIABLE DECLARATIONS --------------------- */
+
     int myIndex;
     int startRowIndex;
+    int startSubIndex;
     int (*sol)[9];
     int (*row)[9];
+    int (*sub)[9];
     int i;
 
+    /* ------------------------ INITIALZATION ------------------------ */
+
     myIndex = ((RowCheckerParams*)ptr)->i;
-    printf("Row checker %d started.\n", myIndex);
-    startRowIndex = (myIndex * 3);
+    startRowIndex = myIndex * 3;
+    startSubIndex = myIndex * 3;
     row = ((RowCheckerParams*)ptr)->row;
     sol = ((RowCheckerParams*)ptr)->sol;
+    sub = ((RowCheckerParams*)ptr)->sub;
+
+    /* -------------------------- CHECK ROWS -------------------------- */
 
     for(i = startRowIndex; i < startRowIndex + 3; i++) {
         (*row)[i] = is_valid_row(sol[i]);
     }
 
-    /* Check subgrids */
+    /* ------------------------ CHECK SUBGRIDS ------------------------ */
 
-    printf("Row checker %d finished.\n", myIndex);
+    for(i = startSubIndex; i < startSubIndex + 3; i++) {
+        (*sub)[i] = is_valid_sub(sol, i);
+    }
+
+    /* ----------------------------- END ------------------------------ */
+
     return NULL;
 
 }
@@ -41,6 +57,33 @@ int is_valid_row(int row[9]) {
             isValid = 0;
         }
         seen[num - 1] = 1;
+    }
+
+    return isValid;
+
+}
+
+int is_valid_sub(int (*sol)[9], int subIndex) {
+
+    int isValid;
+    int seen[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    int startRowIndex;
+    int startColIndex;
+    int r;
+    int c;
+
+    isValid = 1;
+    startRowIndex = subIndex - (subIndex % 3);
+    startColIndex = (subIndex % 3) * 3;
+
+    for(r = startRowIndex; r < startRowIndex + 3; r++) {
+        for(c = startColIndex; c < startColIndex + 3; c++) {
+            int curVal = sol[r][c];
+            if(seen[curVal - 1] == 1) {
+                isValid = 0;
+            }
+            seen[curVal - 1] = 1;
+        }
     }
 
     return isValid;
