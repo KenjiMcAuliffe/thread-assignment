@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<pthread.h>
 
 #include"row_checker.h"
 
@@ -14,6 +15,9 @@ void* row_checker (void* ptr) {
     int (*sol)[9];
     int (*row)[9];
     int (*sub)[9];
+    int* counter;
+    pthread_mutex_t* mutex;
+
     int i;
 
     /* ------------------------ INITIALZATION ------------------------ */
@@ -24,17 +28,31 @@ void* row_checker (void* ptr) {
     row = ((RowCheckerParams*)ptr)->row;
     sol = ((RowCheckerParams*)ptr)->sol;
     sub = ((RowCheckerParams*)ptr)->sub;
+    counter = ((RowCheckerParams*)ptr)->counter;
+    mutex = ((RowCheckerParams*)ptr)->mutex;
 
     /* -------------------------- CHECK ROWS -------------------------- */
 
     for(i = startRowIndex; i < startRowIndex + 3; i++) {
-        (*row)[i] = is_valid_row(sol[i]);
+        int isValid = is_valid_row(sol[i]);
+
+        pthread_mutex_lock(mutex);
+        *counter += isValid;
+        pthread_mutex_unlock(mutex);
+
+        (*row)[i] = isValid;
     }
 
     /* ------------------------ CHECK SUBGRIDS ------------------------ */
 
     for(i = startSubIndex; i < startSubIndex + 3; i++) {
-        (*sub)[i] = is_valid_sub(sol, i);
+        int isValid = is_valid_sub(sol, i);
+
+        pthread_mutex_lock(mutex);
+        *counter += isValid;
+        pthread_mutex_unlock(mutex);
+
+        (*sub)[i] = isValid;
     }
 
     /* ----------------------------- END ------------------------------ */

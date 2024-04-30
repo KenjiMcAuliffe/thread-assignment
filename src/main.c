@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include<pthread.h>
 
 #include"file_parser.h"
@@ -23,6 +24,7 @@ int main(void) {
     pthread_t colThread;
     ColCheckerParams colCheckerParams;
 
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     int i;
 
     /* ---------------------- INITIALIZATION -------------------------- */
@@ -37,6 +39,8 @@ int main(void) {
         rowCheckerParams[i].sol = (int(*)[9])sol;
         rowCheckerParams[i].row = (int(*)[9])row;
         rowCheckerParams[i].sub = (int(*)[9])sub;
+        rowCheckerParams[i].counter = &counter;
+        rowCheckerParams[i].mutex = &mutex;
         pthread_create(
             &rowThreads[i],
             NULL,
@@ -47,6 +51,8 @@ int main(void) {
 
     colCheckerParams.sol = (int(*)[9])sol;
     colCheckerParams.col = (int(*)[9])col;
+    colCheckerParams.counter = &counter;
+    colCheckerParams.mutex = &mutex;
     pthread_create(&colThread, NULL, col_checker, (void*)&colCheckerParams);
 
     /* -------------------------- CLEANUP ----------------------------- */
@@ -75,6 +81,8 @@ int main(void) {
         printf("%d ", sub[i]);
     }
     printf("\n");
+
+    printf("Counter: %d\n", counter);
 
     /* ----------------------------- END ------------------------------ */
 
