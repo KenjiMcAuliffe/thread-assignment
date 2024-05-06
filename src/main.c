@@ -2,37 +2,34 @@
 #include<stdlib.h>
 #include<pthread.h>
 
+#include"argument_parser.h"
 #include"file_parser.h"
 #include"row_checker.h"
 #include"col_checker.h"
+#include"print_results.h"
 
-int main(void) {
+int main(int argc, char* argv[]) {
 
-    /* ---------------------------- BEGIN ----------------------------- */
-
-    /* -------------------- VARIABLE DECLARATIONS --------------------- */
-
+    char* solutionFileName;
+    int iterationDelay;
     int sol[9][9];
     int row[9];
     int col[9];
     int sub[9];
-    int counter;
-
+    int counter = 0;
+    int finishedCount = 0;
     pthread_t rowThreads[3];
     RowCheckerParams rowCheckerParams[3];
-
     pthread_t colThread;
     ColCheckerParams colCheckerParams;
-
-    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_t counterMutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_t finishedCountMutex = PTHREAD_MUTEX_INITIALIZER;
     int i;
 
-    /* ---------------------- INITIALIZATION -------------------------- */
+    parse_arguments(argc, argv, &iterationDelay, &solutionFileName);
+    parse_solution_file(solutionFileName, sol);
 
-    parse_solution_file(sol);
-    counter = 0;
-
-    /* --------------------- THREAD CREATION -------------------------- */
+    /* ------------------------- THREAD CREATION --------------------------- */
 
     for(i = 0; i < 3; i++) {
         rowCheckerParams[i].i = i;
@@ -40,7 +37,10 @@ int main(void) {
         rowCheckerParams[i].row = (int(*)[9])row;
         rowCheckerParams[i].sub = (int(*)[9])sub;
         rowCheckerParams[i].counter = &counter;
-        rowCheckerParams[i].mutex = &mutex;
+        rowCheckerParams[i].iterationDelay = iterationDelay;
+        rowCheckerParams[i].counterMutex = &counterMutex;
+        rowCheckerParams[i].finishedCount = &finishedCount;
+        rowCheckerParams[i].finishedCountMutex = &finishedCountMutex;
         pthread_create(
             &rowThreads[i],
             NULL,
@@ -52,40 +52,24 @@ int main(void) {
     colCheckerParams.sol = (int(*)[9])sol;
     colCheckerParams.col = (int(*)[9])col;
     colCheckerParams.counter = &counter;
-    colCheckerParams.mutex = &mutex;
+    colCheckerParams.counterMutex = &counterMutex;
+    colCheckerParams.iterationDelay = iterationDelay;
+    colCheckerParams.finishedCount = &finishedCount;
+    colCheckerParams.finishedCountMutex = &finishedCountMutex;
     pthread_create(&colThread, NULL, col_checker, (void*)&colCheckerParams);
 
-    /* -------------------------- CLEANUP ----------------------------- */
+    /* ------------------------------ CLEANUP ------------------------------ */
 
     for(i = 0; i < 3; i++) {
         pthread_join(rowThreads[i], NULL);
     }
     pthread_join(colThread, NULL);
 
-    /* --------------------------- OUTPUT ----------------------------- */
+    /* ------------------------------- OUTPUT ------------------------------ */
 
-    printf("Rows: ");
-    for(i = 0; i < 9; i++) {
-        printf("%d ", row[i]);
-    }
-    printf("\n");
+    print_results(row, sub, col, counter);
 
-    printf("Cols: ");
-    for(i = 0; i < 9; i++) {
-        printf("%d ", col[i]);
-    }
-    printf("\n");
-
-    printf("Subs: ");
-    for(i = 0; i < 9; i++) {
-        printf("%d ", sub[i]);
-    }
-    printf("\n");
-
-    printf("Counter: %d\n", counter);
-
-    /* ----------------------------- END ------------------------------ */
+    /* ------------------------------- END --------------------------------- */
 
     return 0;
-
 }

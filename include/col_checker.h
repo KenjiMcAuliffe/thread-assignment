@@ -7,7 +7,10 @@ typedef struct {
     int (*sol)[9];
     int (*col)[9];
     int* counter;
-    pthread_mutex_t* mutex;
+    int* finishedCount;
+    int iterationDelay;
+    pthread_mutex_t* counterMutex;
+    pthread_mutex_t* finishedCountMutex;
 } ColCheckerParams;
 
 void* col_checker (void* ptr);

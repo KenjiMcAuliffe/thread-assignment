@@ -1,61 +1,39 @@
 #include<stdio.h>
 #include<pthread.h>
+#include<unistd.h>
 
 #include"row_checker.h"
 
 void* row_checker (void* ptr) {
 
-    /* --------------------------- BEGIN ------------------------------ */
+    RowCheckerParams* params = (RowCheckerParams*)ptr;
+    int startIndex = (params->i) * 3;
+    int i, correctCount = 0;
 
-    /* -------------------- VARIABLE DECLARATIONS --------------------- */
+    for(i = startIndex; i < startIndex + 3; i++) {
+        int isValid;
 
-    int myIndex;
-    int startRowIndex;
-    int startSubIndex;
-    int (*sol)[9];
-    int (*row)[9];
-    int (*sub)[9];
-    int* counter;
-    pthread_mutex_t* mutex;
+        isValid = is_valid_row(params->sol[i]);
+        correctCount += isValid;
+        (*(params->row))[i] = isValid;
+        usleep(params->iterationDelay * 1000000);
 
-    int i;
-
-    /* ------------------------ INITIALZATION ------------------------ */
-
-    myIndex = ((RowCheckerParams*)ptr)->i;
-    startRowIndex = myIndex * 3;
-    startSubIndex = myIndex * 3;
-    row = ((RowCheckerParams*)ptr)->row;
-    sol = ((RowCheckerParams*)ptr)->sol;
-    sub = ((RowCheckerParams*)ptr)->sub;
-    counter = ((RowCheckerParams*)ptr)->counter;
-    mutex = ((RowCheckerParams*)ptr)->mutex;
-
-    /* -------------------------- CHECK ROWS -------------------------- */
-
-    for(i = startRowIndex; i < startRowIndex + 3; i++) {
-        int isValid = is_valid_row(sol[i]);
-
-        pthread_mutex_lock(mutex);
-        *counter += isValid;
-        pthread_mutex_unlock(mutex);
-
-        (*row)[i] = isValid;
+        isValid = is_valid_sub(params->sol, i);
+        correctCount += isValid;
+        (*(params->sub))[i] = isValid;
+        usleep(params->iterationDelay * 1000000);
     }
 
-    /* ------------------------ CHECK SUBGRIDS ------------------------ */
+    pthread_mutex_lock(params->counterMutex);
+    *(params->counter) += correctCount;
+    pthread_mutex_unlock(params->counterMutex);
 
-    for(i = startSubIndex; i < startSubIndex + 3; i++) {
-        int isValid = is_valid_sub(sol, i);
-
-        pthread_mutex_lock(mutex);
-        *counter += isValid;
-        pthread_mutex_unlock(mutex);
-
-        (*sub)[i] = isValid;
+    pthread_mutex_lock(params->finishedCountMutex);
+    *(params->finishedCount) += 1;
+    if(*(params->finishedCount) == 4) {
+        printf("Thread ID-%d is the last thread.\n", (params->i + 1));
     }
-
-    /* ----------------------------- END ------------------------------ */
+    pthread_mutex_unlock(params->finishedCountMutex);
 
     return NULL;
 
@@ -63,19 +41,9 @@ void* row_checker (void* ptr) {
 
 int is_valid_row(int row[9]) {
 
-    /* --------------------------- BEGIN ------------------------------ */
-
-    /* -------------------- VARIABLE DECLARATIONS --------------------- */
-
-    int isValid;
+    int isValid = 1;
     int seen[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     int i;
-
-    /* ------------------------ INITIALZATION ------------------------ */
-
-    isValid = 1;
-
-    /* --------------------------- CHECKING -------------------------- */
 
     for(i = 0; i < 9; i++) {
         int num = row[i];
@@ -85,32 +53,18 @@ int is_valid_row(int row[9]) {
         seen[num - 1] = 1;
     }
 
-    /* -----------------------------  END ---------------------------- */
-
     return isValid;
 
 }
 
 int is_valid_sub(int (*sol)[9], int subIndex) {
 
-    /* --------------------------- BEGIN ------------------------------ */
-
-    /* -------------------- VARIABLE DECLARATIONS --------------------- */
-
-    int isValid;
+    int isValid = 1;
     int seen[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    int startRowIndex;
-    int startColIndex;
+    int startRowIndex = subIndex - (subIndex % 3);
+    int startColIndex = (subIndex % 3) * 3;
     int r;
     int c;
-
-    /* ------------------------ INITIALZATION ------------------------ */
-
-    isValid = 1;
-    startRowIndex = subIndex - (subIndex % 3);
-    startColIndex = (subIndex % 3) * 3;
-
-    /* --------------------------- CHECKING -------------------------- */
 
     for(r = startRowIndex; r < startRowIndex + 3; r++) {
         for(c = startColIndex; c < startColIndex + 3; c++) {
@@ -121,8 +75,6 @@ int is_valid_sub(int (*sol)[9], int subIndex) {
             seen[curVal - 1] = 1;
         }
     }
-
-    /* -----------------------------  END ---------------------------- */
 
     return isValid;
 

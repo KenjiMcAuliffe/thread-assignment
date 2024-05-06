@@ -9,7 +9,10 @@ typedef struct {
     int (*sub)[9];
     int i;
     int* counter;
-    pthread_mutex_t* mutex;
+    int* finishedCount;
+    int iterationDelay;
+    pthread_mutex_t* counterMutex;
+    pthread_mutex_t* finishedCountMutex;
 } RowCheckerParams;
 
 void* row_checker (void* ptr);

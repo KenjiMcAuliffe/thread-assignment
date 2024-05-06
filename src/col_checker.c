@@ -1,40 +1,31 @@
 #include<stdio.h>
 #include<pthread.h>
+#include<unistd.h>
 
 #include"col_checker.h"
 
 void* col_checker (void* ptr) {
 
-    /* ---------------------------- BEGIN ----------------------------- */
-
-    /* -------------------- VARIABLE DECLARATIONS --------------------- */
-
-    int c;
-    int (*sol)[9];
-    int (*col)[9];
-    int* counter;
-    pthread_mutex_t* mutex;
-
-    /* ---------------------- INITIALIZATION -------------------------- */
-
-    sol = ((ColCheckerParams*)ptr)->sol;
-    col = ((ColCheckerParams*)ptr)->col;
-    counter = ((ColCheckerParams*)ptr)->counter;
-    mutex = ((ColCheckerParams*)ptr)->mutex;
-
-    /* ------------------------- CHECKING ----------------------------- */
+    ColCheckerParams* params = (ColCheckerParams*)ptr;
+    int c, correctCount = 0;
 
     for(c = 0; c < 9; c++) {
-        int isValid = is_valid_col(sol, c);
-
-        pthread_mutex_lock(mutex);
-        *counter += isValid;
-        pthread_mutex_unlock(mutex);
-
-        (*col)[c] = isValid;
+        int isValid = is_valid_col(params->sol, c);
+        correctCount += isValid;
+        (*(params->col))[c] = isValid;
+        usleep(params->iterationDelay * 1000000);
     }
 
-    /* --------------------------- END -------------------------------- */
+    pthread_mutex_lock(params->counterMutex);
+    *(params->counter) += correctCount;
+    pthread_mutex_unlock(params->counterMutex);
+
+    pthread_mutex_lock(params->finishedCountMutex);
+    *(params->finishedCount) += 1;
+    if(*(params->finishedCount) == 4) {
+        printf("Thread ID-4 is the last thread.\n");
+    }
+    pthread_mutex_unlock(params->finishedCountMutex);
 
     return NULL;
 
@@ -42,19 +33,9 @@ void* col_checker (void* ptr) {
 
 int is_valid_col(int (*sol)[9], int colIndex) {
 
-    /* ---------------------------- BEGIN ----------------------------- */
-
-    /* -------------------- VARIABLE DECLARATIONS --------------------- */
-
-    int isValid;
+    int isValid = 1;
     int seen[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     int r;
-
-    /* ---------------------- INITIALIZATION -------------------------- */
-
-    isValid = 1;
-
-    /* ------------------------- CHECKING ----------------------------- */
 
     for(r = 0; r < 9; r++) {
         int (*row)[9] = &sol[r];
@@ -66,8 +47,6 @@ int is_valid_col(int (*sol)[9], int colIndex) {
 
         seen[val - 1] = 1;
     }
-
-    /* --------------------------- END -------------------------------- */
 
     return isValid;
 }
