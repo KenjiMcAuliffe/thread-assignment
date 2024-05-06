@@ -20,7 +20,7 @@ void print_col_thread_results(int col[9]) {
             if(invalidCount != 0) {
                 printf(", ");
             }
-            printf("col %d", i);
+            printf("col %d", (i+1));
             invalidCount++;
         }
     }
@@ -48,7 +48,7 @@ void print_row_thread_results(int row[9], int sub[9], int threadIndex) {
             if(invalidCount != 0) {
                 printf(", ");
             }
-            printf("row %d", i);
+            printf("row %d", (i+1));
             invalidCount++;
         }
 
@@ -56,7 +56,7 @@ void print_row_thread_results(int row[9], int sub[9], int threadIndex) {
             if(invalidCount != 0) {
                 printf(", ");
             }
-            printf("sub %d", i);
+            printf("sub %d", (i+1));
             invalidCount++;
         }
     }
